@@ -1,0 +1,144 @@
+syntax = "proto3";
+
+option go_package = "pkg/proto";
+
+package proto;
+
+service DatabaseService {
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc CreateDatabase(CreateDatabaseRequest) returns (CreateDatabaseResponse);
+  rpc CreateTable(CreateTableRequest) returns (CreateTableResponse);
+  rpc InsertRecord(InsertRecordRequest) returns (InsertRecordResponse);
+  rpc QueryData(QueryDataRequest) returns (QueryDataResponse);
+  rpc UpdateRecord(UpdateRecordRequest) returns (UpdateRecordResponse);
+  rpc DeleteRecord(DeleteRecordRequest) returns (DeleteRecordResponse);
+  rpc UpdateTable(UpdateTableRequest) returns (UpdateTableResponse);
+  rpc AddIndex(AddIndexRequest) returns (AddIndexResponse);
+  rpc DeleteIndex(DeleteIndexRequest) returns (DeleteIndexResponse);
+  rpc ListIndexes(ListIndexesRequest) returns (ListIndexesResponse);
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message CreateUserResponse {
+  string message = 1;
+  // The connection string provided to the user.
+  string connection_string = 2;
+}
+
+// For CreateDatabase, the connection string now includes the database name.
+// The service can parse it to extract the database name and user info.
+message CreateDatabaseRequest {
+  string connection_string = 1;
+}
+
+message CreateDatabaseResponse {
+  string message = 1;
+  // The generated connection string returned to the user.
+  string connection_string = 2;
+}
+
+// For operations on an existing database, the client supplies the connection string.
+message CreateTableRequest {
+  string table_name = 1;
+  map<string, string> columns = 2; // column_name -> type (e.g., "id": "INTEGER PRIMARY KEY")
+  string connection_string = 3;
+}
+
+message CreateTableResponse {
+  string message = 1;
+}
+
+message InsertRecordRequest {
+  string table_name = 1;
+  map<string, string> record = 2; // column_name -> value
+  string connection_string = 3;
+}
+
+message InsertRecordResponse {
+  string message = 1;
+}
+
+message QueryDataRequest {
+  string table_name = 1;
+  string columns = 2;
+  string condition = 3;
+  string connection_string = 4;
+}
+
+message QueryRow {
+  map<string, string> data = 1;
+}
+
+message QueryDataResponse {
+  repeated QueryRow rows = 1;
+}
+
+message DeleteRecordRequest {
+  string table_name = 1;
+  string condition = 2;
+  string connection_string = 3;
+}
+
+message DeleteRecordResponse {
+  string message = 1;
+}
+
+message UpdateTableRequest {
+  string table_name = 1;
+  string column_name = 2;
+  string column_type = 3;
+  string connection_string = 4;
+}
+
+message UpdateTableResponse {
+  string message = 1;
+}
+
+message UpdateRecordRequest {
+  string table_name = 1;
+  map<string, string> updates = 2;
+  string condition = 3;
+  string connection_string = 4;
+}
+
+message UpdateRecordResponse {
+  string message = 1;
+}
+
+message AddIndexRequest {
+  string table_name = 1;
+  string index_name = 2;
+  repeated string columns = 3;
+  string connection_string = 4;
+}
+
+message AddIndexResponse {
+  string message = 1;
+}
+
+message DeleteIndexRequest {
+  string index_name = 1;
+  string connection_string = 2;
+}
+
+message DeleteIndexResponse {
+  string message = 1;
+}
+
+message ListIndexesRequest {
+  string connection_string = 1;
+}
+
+message Index {
+  string index_name = 1;
+  string table_name = 2;
+  string columns = 3;
+}
+
+message ListIndexesResponse {
+  repeated Index indexes = 1;
+}

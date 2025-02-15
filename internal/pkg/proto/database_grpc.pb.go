@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v6.30.0--rc1
-// source: proto/database.proto
+// source: database.proto
 
-package databasepb
+package proto
 
 import (
 	context "context"
@@ -19,22 +19,24 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	DatabaseService_CreateDatabase_FullMethodName = "/databasepb.DatabaseService/CreateDatabase"
-	DatabaseService_CreateTable_FullMethodName    = "/databasepb.DatabaseService/CreateTable"
-	DatabaseService_InsertRecord_FullMethodName   = "/databasepb.DatabaseService/InsertRecord"
-	DatabaseService_QueryData_FullMethodName      = "/databasepb.DatabaseService/QueryData"
-	DatabaseService_UpdateRecord_FullMethodName   = "/databasepb.DatabaseService/UpdateRecord"
-	DatabaseService_DeleteRecord_FullMethodName   = "/databasepb.DatabaseService/DeleteRecord"
-	DatabaseService_UpdateTable_FullMethodName    = "/databasepb.DatabaseService/UpdateTable"
-	DatabaseService_AddIndex_FullMethodName       = "/databasepb.DatabaseService/AddIndex"
-	DatabaseService_DeleteIndex_FullMethodName    = "/databasepb.DatabaseService/DeleteIndex"
-	DatabaseService_ListIndexes_FullMethodName    = "/databasepb.DatabaseService/ListIndexes"
+	DatabaseService_CreateUser_FullMethodName     = "/proto.DatabaseService/CreateUser"
+	DatabaseService_CreateDatabase_FullMethodName = "/proto.DatabaseService/CreateDatabase"
+	DatabaseService_CreateTable_FullMethodName    = "/proto.DatabaseService/CreateTable"
+	DatabaseService_InsertRecord_FullMethodName   = "/proto.DatabaseService/InsertRecord"
+	DatabaseService_QueryData_FullMethodName      = "/proto.DatabaseService/QueryData"
+	DatabaseService_UpdateRecord_FullMethodName   = "/proto.DatabaseService/UpdateRecord"
+	DatabaseService_DeleteRecord_FullMethodName   = "/proto.DatabaseService/DeleteRecord"
+	DatabaseService_UpdateTable_FullMethodName    = "/proto.DatabaseService/UpdateTable"
+	DatabaseService_AddIndex_FullMethodName       = "/proto.DatabaseService/AddIndex"
+	DatabaseService_DeleteIndex_FullMethodName    = "/proto.DatabaseService/DeleteIndex"
+	DatabaseService_ListIndexes_FullMethodName    = "/proto.DatabaseService/ListIndexes"
 )
 
 // DatabaseServiceClient is the client API for DatabaseService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DatabaseServiceClient interface {
+	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	CreateDatabase(ctx context.Context, in *CreateDatabaseRequest, opts ...grpc.CallOption) (*CreateDatabaseResponse, error)
 	CreateTable(ctx context.Context, in *CreateTableRequest, opts ...grpc.CallOption) (*CreateTableResponse, error)
 	InsertRecord(ctx context.Context, in *InsertRecordRequest, opts ...grpc.CallOption) (*InsertRecordResponse, error)
@@ -53,6 +55,16 @@ type databaseServiceClient struct {
 
 func NewDatabaseServiceClient(cc grpc.ClientConnInterface) DatabaseServiceClient {
 	return &databaseServiceClient{cc}
+}
+
+func (c *databaseServiceClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateUserResponse)
+	err := c.cc.Invoke(ctx, DatabaseService_CreateUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *databaseServiceClient) CreateDatabase(ctx context.Context, in *CreateDatabaseRequest, opts ...grpc.CallOption) (*CreateDatabaseResponse, error) {
@@ -159,6 +171,7 @@ func (c *databaseServiceClient) ListIndexes(ctx context.Context, in *ListIndexes
 // All implementations must embed UnimplementedDatabaseServiceServer
 // for forward compatibility.
 type DatabaseServiceServer interface {
+	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	CreateDatabase(context.Context, *CreateDatabaseRequest) (*CreateDatabaseResponse, error)
 	CreateTable(context.Context, *CreateTableRequest) (*CreateTableResponse, error)
 	InsertRecord(context.Context, *InsertRecordRequest) (*InsertRecordResponse, error)
@@ -179,6 +192,9 @@ type DatabaseServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedDatabaseServiceServer struct{}
 
+func (UnimplementedDatabaseServiceServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
+}
 func (UnimplementedDatabaseServiceServer) CreateDatabase(context.Context, *CreateDatabaseRequest) (*CreateDatabaseResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateDatabase not implemented")
 }
@@ -228,6 +244,24 @@ func RegisterDatabaseServiceServer(s grpc.ServiceRegistrar, srv DatabaseServiceS
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&DatabaseService_ServiceDesc, srv)
+}
+
+func _DatabaseService_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DatabaseServiceServer).CreateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DatabaseService_CreateUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DatabaseServiceServer).CreateUser(ctx, req.(*CreateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _DatabaseService_CreateDatabase_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -414,9 +448,13 @@ func _DatabaseService_ListIndexes_Handler(srv interface{}, ctx context.Context, 
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var DatabaseService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "databasepb.DatabaseService",
+	ServiceName: "proto.DatabaseService",
 	HandlerType: (*DatabaseServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateUser",
+			Handler:    _DatabaseService_CreateUser_Handler,
+		},
 		{
 			MethodName: "CreateDatabase",
 			Handler:    _DatabaseService_CreateDatabase_Handler,
@@ -459,5 +497,5 @@ var DatabaseService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/database.proto",
+	Metadata: "database.proto",
 }
