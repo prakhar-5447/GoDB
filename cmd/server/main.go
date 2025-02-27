@@ -4,14 +4,17 @@ import (
 	"log"
 	"net"
 
+	"github.com/prakhar-5447/GoDB/internal/audit"
 	"github.com/prakhar-5447/GoDB/internal/auth"
 	"github.com/prakhar-5447/GoDB/internal/db"
-	"github.com/prakhar-5447/GoDB/internal/server"
+	"github.com/prakhar-5447/GoDB/internal/service"
 
 	"google.golang.org/grpc"
 )
 
 func main() {
+	audit.InitAuditLogger()
+
 	// Ensure the authentication database is initialized.
 	if err := auth.InitAuthDatabase(); err != nil {
 		log.Fatalf("Auth DB initialization failed: %v", err)
@@ -29,7 +32,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	server.RegisterGRPCServices(grpcServer)
+	service.RegisterGRPCServices(grpcServer)
 
 	log.Println("🚀 gRPC server running on port 50051...")
 	if err := grpcServer.Serve(listener); err != nil {

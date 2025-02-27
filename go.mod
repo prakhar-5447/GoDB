@@ -3,6 +3,7 @@ module github.com/prakhar-5447/GoDB
 go 1.24.0
 
 require (
+	github.com/fsnotify/fsnotify v1.8.0
 	github.com/mattn/go-sqlite3 v1.14.24
 	google.golang.org/grpc v1.70.0
 	google.golang.org/protobuf v1.36.5

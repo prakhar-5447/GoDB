@@ -19,17 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	DatabaseService_CreateUser_FullMethodName     = "/proto.DatabaseService/CreateUser"
-	DatabaseService_CreateDatabase_FullMethodName = "/proto.DatabaseService/CreateDatabase"
-	DatabaseService_CreateTable_FullMethodName    = "/proto.DatabaseService/CreateTable"
-	DatabaseService_InsertRecord_FullMethodName   = "/proto.DatabaseService/InsertRecord"
-	DatabaseService_QueryData_FullMethodName      = "/proto.DatabaseService/QueryData"
-	DatabaseService_UpdateRecord_FullMethodName   = "/proto.DatabaseService/UpdateRecord"
-	DatabaseService_DeleteRecord_FullMethodName   = "/proto.DatabaseService/DeleteRecord"
-	DatabaseService_UpdateTable_FullMethodName    = "/proto.DatabaseService/UpdateTable"
-	DatabaseService_AddIndex_FullMethodName       = "/proto.DatabaseService/AddIndex"
-	DatabaseService_DeleteIndex_FullMethodName    = "/proto.DatabaseService/DeleteIndex"
-	DatabaseService_ListIndexes_FullMethodName    = "/proto.DatabaseService/ListIndexes"
+	DatabaseService_CreateUser_FullMethodName            = "/proto.DatabaseService/CreateUser"
+	DatabaseService_CreateDatabase_FullMethodName        = "/proto.DatabaseService/CreateDatabase"
+	DatabaseService_CreateTable_FullMethodName           = "/proto.DatabaseService/CreateTable"
+	DatabaseService_InsertRecord_FullMethodName          = "/proto.DatabaseService/InsertRecord"
+	DatabaseService_InsertMultipleRecords_FullMethodName = "/proto.DatabaseService/InsertMultipleRecords"
+	DatabaseService_QueryData_FullMethodName             = "/proto.DatabaseService/QueryData"
+	DatabaseService_UpdateRecord_FullMethodName          = "/proto.DatabaseService/UpdateRecord"
+	DatabaseService_DeleteRecord_FullMethodName          = "/proto.DatabaseService/DeleteRecord"
+	DatabaseService_UpdateTable_FullMethodName           = "/proto.DatabaseService/UpdateTable"
+	DatabaseService_AddIndex_FullMethodName              = "/proto.DatabaseService/AddIndex"
+	DatabaseService_DeleteIndex_FullMethodName           = "/proto.DatabaseService/DeleteIndex"
+	DatabaseService_ListIndexes_FullMethodName           = "/proto.DatabaseService/ListIndexes"
 )
 
 // DatabaseServiceClient is the client API for DatabaseService service.
@@ -40,6 +41,7 @@ type DatabaseServiceClient interface {
 	CreateDatabase(ctx context.Context, in *CreateDatabaseRequest, opts ...grpc.CallOption) (*CreateDatabaseResponse, error)
 	CreateTable(ctx context.Context, in *CreateTableRequest, opts ...grpc.CallOption) (*CreateTableResponse, error)
 	InsertRecord(ctx context.Context, in *InsertRecordRequest, opts ...grpc.CallOption) (*InsertRecordResponse, error)
+	InsertMultipleRecords(ctx context.Context, in *InsertMultipleRecordsRequest, opts ...grpc.CallOption) (*InsertMultipleRecordsResponse, error)
 	QueryData(ctx context.Context, in *QueryDataRequest, opts ...grpc.CallOption) (*QueryDataResponse, error)
 	UpdateRecord(ctx context.Context, in *UpdateRecordRequest, opts ...grpc.CallOption) (*UpdateRecordResponse, error)
 	DeleteRecord(ctx context.Context, in *DeleteRecordRequest, opts ...grpc.CallOption) (*DeleteRecordResponse, error)
@@ -91,6 +93,16 @@ func (c *databaseServiceClient) InsertRecord(ctx context.Context, in *InsertReco
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(InsertRecordResponse)
 	err := c.cc.Invoke(ctx, DatabaseService_InsertRecord_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *databaseServiceClient) InsertMultipleRecords(ctx context.Context, in *InsertMultipleRecordsRequest, opts ...grpc.CallOption) (*InsertMultipleRecordsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(InsertMultipleRecordsResponse)
+	err := c.cc.Invoke(ctx, DatabaseService_InsertMultipleRecords_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -175,6 +187,7 @@ type DatabaseServiceServer interface {
 	CreateDatabase(context.Context, *CreateDatabaseRequest) (*CreateDatabaseResponse, error)
 	CreateTable(context.Context, *CreateTableRequest) (*CreateTableResponse, error)
 	InsertRecord(context.Context, *InsertRecordRequest) (*InsertRecordResponse, error)
+	InsertMultipleRecords(context.Context, *InsertMultipleRecordsRequest) (*InsertMultipleRecordsResponse, error)
 	QueryData(context.Context, *QueryDataRequest) (*QueryDataResponse, error)
 	UpdateRecord(context.Context, *UpdateRecordRequest) (*UpdateRecordResponse, error)
 	DeleteRecord(context.Context, *DeleteRecordRequest) (*DeleteRecordResponse, error)
@@ -203,6 +216,9 @@ func (UnimplementedDatabaseServiceServer) CreateTable(context.Context, *CreateTa
 }
 func (UnimplementedDatabaseServiceServer) InsertRecord(context.Context, *InsertRecordRequest) (*InsertRecordResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InsertRecord not implemented")
+}
+func (UnimplementedDatabaseServiceServer) InsertMultipleRecords(context.Context, *InsertMultipleRecordsRequest) (*InsertMultipleRecordsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InsertMultipleRecords not implemented")
 }
 func (UnimplementedDatabaseServiceServer) QueryData(context.Context, *QueryDataRequest) (*QueryDataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method QueryData not implemented")
@@ -314,6 +330,24 @@ func _DatabaseService_InsertRecord_Handler(srv interface{}, ctx context.Context,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DatabaseServiceServer).InsertRecord(ctx, req.(*InsertRecordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DatabaseService_InsertMultipleRecords_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InsertMultipleRecordsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DatabaseServiceServer).InsertMultipleRecords(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DatabaseService_InsertMultipleRecords_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DatabaseServiceServer).InsertMultipleRecords(ctx, req.(*InsertMultipleRecordsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -466,6 +500,10 @@ var DatabaseService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "InsertRecord",
 			Handler:    _DatabaseService_InsertRecord_Handler,
+		},
+		{
+			MethodName: "InsertMultipleRecords",
+			Handler:    _DatabaseService_InsertMultipleRecords_Handler,
 		},
 		{
 			MethodName: "QueryData",

@@ -42,15 +42,6 @@ func InitAuthDatabase() error {
 		return fmt.Errorf("failed to query users table: %w", err)
 	}
 
-	// Insert a default user if table is empty.
-	if count == 0 {
-		// For demonstration purposes: default username "john", password "secret123"
-		_, err = db.Exec("INSERT INTO users (username, password) VALUES (?, ?)", "john", "secret123")
-		if err != nil {
-			return fmt.Errorf("failed to insert default user: %w", err)
-		}
-	}
-
 	return nil
 }
 
@@ -85,6 +76,5 @@ func ValidateUserCredentials(username, password string) (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("failed to query auth database: %w", err)
 	}
-
 	return count > 0, nil
 }

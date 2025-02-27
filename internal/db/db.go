@@ -18,8 +18,8 @@ func OpenDatabase(ConnectionString string) (*sql.DB, error) {
 		return nil, err
 	}
 	// Validate credentials using the auth package.
-	_, err = auth.ValidateUserCredentials(username, password)
-	if err != nil {
+	auth, err := auth.ValidateUserCredentials(username, password)
+	if !auth || err != nil {
 		return nil, fmt.Errorf("authentication failed")
 	}
 
